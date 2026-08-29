@@ -23,8 +23,8 @@ jobs:
     timeout-minutes: 15
     env:
       ENVIRONMENT: homologacao
-      SUPABASE_URL: https://teste.supabase.co
-      SUPABASE_PUBLISHABLE_KEY: chave-ficticia-ci
+      SUPABASE_URL: https://projeto-teste.supabase.co
+      SUPABASE_PUBLISHABLE_KEY: sb_publishable_teste
       LSASSIST_ENV_FILE: .env.ci-inexistente
     steps:
       - name: Confirmar commit solicitado
