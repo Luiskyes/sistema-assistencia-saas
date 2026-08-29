@@ -3,9 +3,8 @@ import os
 os.environ.setdefault("SUPABASE_URL", "https://projeto-teste.supabase.co")
 os.environ.setdefault("SUPABASE_PUBLISHABLE_KEY", "sb_publishable_teste")
 
-from fastapi.testclient import TestClient  # noqa: E402
-
 from app.main import app  # noqa: E402
+from fastapi.testclient import TestClient  # noqa: E402
 
 
 def test_health() -> None:
