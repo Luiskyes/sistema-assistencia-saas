@@ -5,17 +5,17 @@ from uuid import UUID
 os.environ.setdefault("SUPABASE_URL", "https://projeto-teste.supabase.co")
 os.environ.setdefault("SUPABASE_PUBLISHABLE_KEY", "sb_publishable_teste")
 
-from fastapi.testclient import TestClient  # noqa: E402
-
 from app.dependencies import get_current_session  # noqa: E402
 from app.main import app  # noqa: E402
 from app.schemas import (  # noqa: E402
+    AssistenciaAtual,
     FuncaoUsuario,
     SessaoAtual,
     TokenClaims,
     UsuarioAutenticado,
 )
 from app.security import AuthenticatedRequest, get_authenticated_request  # noqa: E402
+from fastapi.testclient import TestClient  # noqa: E402
 
 ASSISTENCIA_ID = UUID("10000000-0000-0000-0000-000000000001")
 USUARIO_ID = UUID("20000000-0000-0000-0000-000000000001")
@@ -38,7 +38,11 @@ async def fake_session() -> SessaoAtual:
             ativo=True,
             data_criacao=AGORA,
         ),
-        assistencia_ativa=True,
+        assistencia=AssistenciaAtual(
+            id_assistencia=ASSISTENCIA_ID,
+            nome_assistencia="Assistência Teste",
+            ativo=True,
+        ),
     )
 
 

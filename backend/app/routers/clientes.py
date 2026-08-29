@@ -13,8 +13,7 @@ router = APIRouter(prefix="/clientes", tags=["Clientes"])
 AuthRequest = Annotated[AuthenticatedRequest, Depends(get_authenticated_request)]
 
 CLIENTE_SELECT = (
-    "id_cliente,id_assistencia,cpf_cliente,nome_cliente,"
-    "telefone,endereco_cliente,data_criacao"
+    "id_cliente,id_assistencia,cpf_cliente,nome_cliente,telefone,endereco_cliente,data_criacao"
 )
 
 

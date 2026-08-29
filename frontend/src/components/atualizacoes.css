@@ -1,0 +1,197 @@
+.release-panel {
+  --release-cyan: #077a98;
+  --release-purple: #5316b5;
+  --release-orange: #a65300;
+  --release-green: #006e0b;
+  --release-pink: #b52162;
+  --release-red: #b42323;
+  --release-yellow: #7a6600;
+  display: grid;
+  gap: 20px;
+  width: min(100%, 1100px);
+  margin: 0 auto;
+  color: var(--ls-text);
+}
+
+.release-panel header { display: grid; gap: 8px; }
+.release-panel header > span {
+  color: var(--ls-primary);
+  font-size: .7rem;
+  font-weight: 850;
+  letter-spacing: .1em;
+}
+.release-panel header h2, .release-panel header p,
+.release-card h3, .release-card p { margin: 0; }
+.release-panel header p, .release-card p, .release-upload label { color: var(--ls-text-soft); }
+.release-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 5px; }
+.release-flow span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 9px;
+  border: 1px solid var(--ls-border);
+  border-radius: 7px;
+  color: var(--ls-text-soft);
+  background: var(--ls-surface);
+  font-size: .72rem;
+  font-weight: 750;
+}
+.release-flow b {
+  display: inline-grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--ls-primary);
+  font-size: .65rem;
+}
+.release-flow i { color: var(--ls-muted); font-style: normal; }
+
+.release-warning {
+  padding: 15px 17px;
+  border: 1px solid color-mix(in srgb, var(--ls-orange) 52%, var(--ls-border));
+  border-left: 4px solid var(--ls-orange);
+  border-radius: 10px;
+  color: color-mix(in srgb, var(--ls-orange) 45%, var(--ls-text));
+  background: color-mix(in srgb, var(--ls-orange) 9%, var(--ls-surface));
+  line-height: 1.55;
+}
+
+.release-upload, .release-card {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid var(--ls-border);
+  border-radius: 12px;
+  background: var(--ls-surface);
+  box-shadow: 0 8px 24px color-mix(in srgb, #07111f 7%, transparent);
+}
+.release-card h3 { color: var(--ls-text); font-size: 1rem; }
+
+.release-panel button {
+  min-height: 40px;
+  padding: 9px 14px;
+  border: 1px solid color-mix(in srgb, var(--ls-primary) 42%, var(--ls-border));
+  border-radius: 8px;
+  color: var(--ls-primary);
+  background: color-mix(in srgb, var(--ls-primary) 6%, var(--ls-surface));
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+  transition: background .16s ease, border-color .16s ease, color .16s ease, transform .16s ease;
+}
+.release-panel button:hover:not(:disabled) {
+  border-color: var(--ls-primary);
+  background: color-mix(in srgb, var(--ls-primary) 13%, var(--ls-surface));
+  transform: translateY(-1px);
+}
+.release-panel button.primary-action {
+  border-color: var(--ls-action-bg);
+  color: #fff;
+  background: var(--ls-action-bg);
+}
+.release-panel button.primary-action:hover:not(:disabled) { background: var(--ls-action-hover); }
+.release-panel button.release-upload-action:not(:disabled) {
+  border-color: var(--release-pink) !important;
+  background: var(--release-pink) !important;
+}
+.release-panel button.release-connect-action { --release-button-accent: var(--release-cyan); }
+.release-panel button.release-test-action { --release-button-accent: var(--release-purple); }
+.release-panel button.release-analyze-action { --release-button-accent: var(--release-orange); }
+.release-panel button.release-report-action { --release-button-accent: var(--release-cyan); }
+.release-panel button.release-apply-action { --release-button-accent: var(--release-green); }
+.release-panel button[class*="release-"][class$="-action"]:not(.primary-action):not(:disabled) {
+  border-color: color-mix(in srgb, var(--release-button-accent) 58%, var(--ls-border));
+  color: var(--release-button-accent);
+  background: color-mix(in srgb, var(--release-button-accent) 10%, var(--ls-surface));
+}
+.release-panel button[class*="release-"][class$="-action"]:not(.primary-action):hover:not(:disabled) {
+  border-color: var(--release-button-accent);
+  background: color-mix(in srgb, var(--release-button-accent) 17%, var(--ls-surface));
+}
+.release-panel button:disabled {
+  border-color: var(--ls-border);
+  color: var(--ls-muted);
+  background: var(--ls-surface-2);
+  opacity: 1;
+  cursor: not-allowed;
+  transform: none;
+}
+.release-panel button.primary-action:disabled {
+  border-color: var(--ls-border) !important;
+  color: var(--ls-muted) !important;
+  background: var(--ls-surface-2) !important;
+  box-shadow: none !important;
+  filter: none;
+}
+.release-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.release-upload input[type="file"] {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid var(--ls-border);
+  border-radius: 8px;
+  color: var(--ls-text-soft);
+  background: var(--ls-surface-2);
+  font: inherit;
+}
+.release-upload input[type="file"]::file-selector-button {
+  margin-right: 12px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--ls-text);
+  background: var(--ls-surface-3);
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+.release-upload input[type="file"]:focus-visible,
+.release-panel button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--ls-primary) 25%, transparent);
+  outline-offset: 2px;
+}
+
+.release-card a { color: var(--ls-primary); font-weight: 750; }
+.release-card ul { margin: 0; padding-left: 20px; color: var(--ls-text-soft); }
+.release-card dl { margin: 0; }
+.release-card dl > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--ls-border);
+}
+.release-card dd { margin: 0; color: var(--ls-text-soft); font-weight: 750; }
+.release-hash { color: var(--ls-muted); overflow-wrap: anywhere; }
+
+:root[data-theme="dark"] .release-upload,
+:root[data-theme="dark"] .release-card {
+  background: color-mix(in srgb, var(--ls-surface) 90%, #162440);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .2);
+}
+:root[data-theme="dark"] .release-panel {
+  --release-cyan: #49c5eb;
+  --release-purple: #b99aff;
+  --release-orange: #ffb44f;
+  --release-green: #59d663;
+  --release-pink: #ff83af;
+  --release-red: #ff6969;
+  --release-yellow: #ffe45a;
+}
+:root[data-theme="dark"] .release-panel button.release-upload-action:not(:disabled) {
+  border-color: #9c079d !important;
+  background: #9c079d !important;
+}
+:root[data-theme="dark"] .release-warning {
+  color: #f1c177;
+  background: color-mix(in srgb, var(--ls-orange) 10%, #1c2d4d);
+}
+
+@media (max-width: 640px) {
+  .release-upload, .release-card { padding: 16px; }
+  .release-actions button { width: 100%; }
+  .release-flow i { display: none; }
+}

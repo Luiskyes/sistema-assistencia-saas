@@ -14,7 +14,9 @@ class PublicConfig(BaseModel):
 @router.get("/public", response_model=PublicConfig, summary="Configuração pública do frontend")
 async def public_config(response: Response) -> PublicConfig:
     settings = get_settings()
-    response.headers["Cache-Control"] = "public, max-age=300"
+    response.headers["Cache-Control"] = (
+        "public, max-age=300" if settings.environment == "production" else "no-store"
+    )
     return PublicConfig(
         supabase_url=settings.supabase_url,
         supabase_publishable_key=settings.supabase_publishable_key,

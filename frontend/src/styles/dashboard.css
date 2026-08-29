@@ -1,0 +1,101 @@
+.dashboard {
+  min-height: 100vh;
+  display: flex;
+  background: #f6f8f7;
+  color: #12231c;
+}
+
+.sidebar {
+  width: 270px;
+  padding: 28px;
+  background: #103b2d;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.brand {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.brand small {
+  display: block;
+  opacity: .7;
+}
+
+nav {
+  margin-top: 50px;
+  display: grid;
+  gap: 12px;
+}
+
+nav a {
+  padding: 12px;
+  border-radius: 10px;
+  color: white;
+  opacity: .8;
+}
+
+nav .active {
+  background: rgba(255,255,255,.12);
+}
+
+.user-box {
+  margin-top: auto;
+  display: grid;
+  gap: 8px;
+}
+
+.user-box button {
+  margin-top: 12px;
+  padding: 10px;
+}
+
+.content {
+  flex: 1;
+  padding: 40px;
+}
+
+.content header p {
+  color: #527266;
+}
+
+.cards {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.cards div,
+.panel {
+  background: white;
+  padding: 24px;
+  border-radius: 18px;
+}
+
+.cards strong {
+  display: block;
+  font-size: 32px;
+  margin-top: 12px;
+}
+
+.panel {
+  margin-top: 30px;
+}
+
+@media (max-width: 900px) {
+  .dashboard {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: auto;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+  }
+}

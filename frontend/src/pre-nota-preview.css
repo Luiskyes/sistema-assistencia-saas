@@ -1,0 +1,209 @@
+
+/* LSAssist - Pré-nota térmica isolada da tela de OS */
+
+.pre-note-preview-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 100000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 24px !important;
+  overflow: auto !important;
+  background: rgba(2, 8, 18, 0.88) !important;
+  backdrop-filter: blur(6px);
+}
+
+.pre-note-preview-dialog {
+  width: min(760px, 100%) !important;
+  max-height: calc(100vh - 48px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  border: 1px solid var(--ls-border, #26364d) !important;
+  border-radius: 16px !important;
+  background: var(--ls-surface, #0f1b2c) !important;
+  color: var(--ls-text, #f3f7fb) !important;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.55) !important;
+}
+
+.pre-note-preview-toolbar {
+  flex: 0 0 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  min-height: 78px !important;
+  padding: 16px 18px !important;
+  border-bottom: 1px solid var(--ls-border, #26364d) !important;
+  background: var(--ls-surface, #0f1b2c) !important;
+}
+
+.pre-note-preview-toolbar > div:first-child {
+  min-width: 0 !important;
+}
+
+.pre-note-preview-toolbar h3 {
+  margin: 2px 0 4px !important;
+  font-size: 21px !important;
+  line-height: 1.2 !important;
+  color: var(--ls-text, #f3f7fb) !important;
+}
+
+.pre-note-preview-toolbar p {
+  margin: 0 !important;
+  font-size: 12px !important;
+  color: var(--ls-muted, #9aa9bc) !important;
+}
+
+.pre-note-preview-toolbar-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-shrink: 0 !important;
+}
+
+.pre-note-preview-stage {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow: auto !important;
+  padding: 28px !important;
+  background: #cbd2da !important;
+}
+
+.thermal-receipt-preview {
+  box-sizing: border-box !important;
+  width: 80mm !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
+  padding: 5mm 4.5mm 8mm !important;
+  background: #ffffff !important;
+  color: #101010 !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: 12px !important;
+  line-height: 1.28 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.25) !important;
+}
+
+.thermal-receipt-preview * {
+  box-sizing: border-box !important;
+  color: inherit;
+}
+
+.thermal-receipt-header {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 3px !important;
+  text-align: center !important;
+}
+
+.thermal-brand {
+  font-size: 25px !important;
+  line-height: 1 !important;
+  font-weight: 800 !important;
+}
+
+.thermal-receipt-header > span {
+  font-size: 12px !important;
+}
+
+.thermal-receipt-header h4 {
+  margin: 5px 0 1px !important;
+  font-size: 16px !important;
+  line-height: 1.15 !important;
+}
+
+.thermal-receipt-header b {
+  color: #8b4300 !important;
+  font-size: 11px !important;
+}
+
+.thermal-rule {
+  height: 0 !important;
+  margin: 11px 0 9px !important;
+  border: 0 !important;
+  border-top: 1px dashed #8d8d8d !important;
+}
+
+.thermal-info-block {
+  display: block !important;
+  margin: 0 0 10px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.thermal-info-block h5 {
+  margin: 0 0 4px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+}
+
+.thermal-info-block p {
+  margin: 1px 0 !important;
+  padding: 0 !important;
+  font-size: 12px !important;
+  line-height: 1.28 !important;
+  overflow-wrap: anywhere !important;
+}
+
+.thermal-total {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  margin: 0 !important;
+}
+
+.thermal-total span {
+  font-size: 13px !important;
+  font-weight: 800 !important;
+}
+
+.thermal-total strong {
+  font-size: 24px !important;
+  line-height: 1.08 !important;
+  font-weight: 800 !important;
+}
+
+.thermal-receipt-footer {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  margin: 0 !important;
+  text-align: center !important;
+  font-size: 10px !important;
+}
+
+.thermal-receipt-footer p {
+  margin: 0 !important;
+  font-size: 10px !important;
+  line-height: 1.25 !important;
+}
+
+@media (max-width: 640px) {
+  .pre-note-preview-backdrop {
+    padding: 8px !important;
+  }
+
+  .pre-note-preview-dialog {
+    max-height: calc(100vh - 16px) !important;
+    border-radius: 12px !important;
+  }
+
+  .pre-note-preview-toolbar {
+    align-items: stretch !important;
+    flex-direction: column !important;
+  }
+
+  .pre-note-preview-toolbar-actions {
+    justify-content: space-between !important;
+  }
+
+  .pre-note-preview-stage {
+    padding: 12px !important;
+  }
+}

@@ -12,6 +12,10 @@ PostgreSQL/Supabase.
 - Consulta do perfil atual usando a Data API e preservando a RLS.
 - Cadastro, listagem, busca, consulta e edição de clientes.
 - Cadastro, listagem, filtro, consulta e edição de equipamentos vinculados aos clientes.
+- Controle de estoque, saldo mínimo, ajustes e histórico de movimentações.
+- Fluxo de ordens de serviço com permissões por função e histórico de status.
+- Geração de pré-nota/orçamento em PDF para impressão térmica.
+- Dashboard React com módulos de clientes, equipamentos, estoque e ordens.
 - Normalização de CPF e bloqueio do id da assistência enviado pelo navegador.
 - Endpoint público de saúde e documentação Swagger.
 - Frontend React com login e definição de senha por convite.
@@ -50,8 +54,19 @@ Abra:
 
 ## Testar
 
-    pytest
-    ruff check .
+    python -m pytest -q
+    ruff check backend/app tests main.py
+    cd frontend
+    npm.cmd run typecheck
+    npm.cmd run build
+
+## Banco e migrations
+
+Em um projeto novo, execute primeiro `supabase/schema.sql`. Em um projeto já
+existente, aplique em ordem os arquivos de `supabase/migrations/`.
+
+A migration `004_permissoes_defesa_em_profundidade.sql` replica no banco as
+restrições operacionais do FastAPI, impedindo contorno das regras via PostgREST.
 
 ## Como a autenticação funciona
 
@@ -74,6 +89,19 @@ Abra:
 - GET /api/v1/equipamentos/{id_equip}
 - POST /api/v1/equipamentos
 - PATCH /api/v1/equipamentos/{id_equip}
+- GET /api/v1/estoque
+- POST /api/v1/estoque
+- PATCH /api/v1/estoque/{id_item}
+- POST /api/v1/estoque/{id_item}/ajuste
+- GET /api/v1/estoque/{id_item}/movimentos
+- GET /api/v1/usuarios
+- GET /api/v1/ordens
+- POST /api/v1/ordens
+- PATCH /api/v1/ordens/{id_os}
+- POST /api/v1/ordens/{id_os}/status
+- GET /api/v1/ordens/{id_os}/historico
+- GET /api/v1/ordens/{id_os}/pre-nota.pdf
+- POST /api/v1/ordens/{id_os}/pre-nota/impressao
 
 ## Frontend
 
