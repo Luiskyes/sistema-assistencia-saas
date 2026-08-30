@@ -4,7 +4,11 @@ export interface ReleaseReport {
   id: string;
   created: string;
   sha256: string;
-  status: "RECEBIDO" | "BLOQUEADO" | "AGUARDANDO_EXECUTOR";
+  status: "RECEBIDO" | "BLOQUEADO" | "AGUARDANDO_EXECUTOR" | "TEMA_VALIDADO";
+  themes?: Record<"light" | "dark", Record<string, string>>;
+  base_version?: string;
+  notes?: string;
+  expected_revision?: number;
   version?: string;
   notice?: string;
   errors: string[];
@@ -29,6 +33,40 @@ export function enviarVersao(token: string, file: File) {
 
 export function analisarVersao(token: string, id: string) {
   return apiFetch<ReleaseReport>(`/api/v1/plataforma/versoes/${id}/analisar`, token, { method: "POST" });
+}
+
+export interface InstalledTheme {
+  can_restore: boolean;
+  version: string;
+  revision: number;
+  themes: Partial<Record<"light" | "dark", Record<string, string>>>;
+  release_id: string | null;
+}
+
+export function historicoTema(token: string) {
+  return apiFetch<{ revision: number; actor: string; created: string; action: string }[]>(
+    "/api/v1/plataforma/tema/historico", token,
+  );
+}
+
+export function consultarTema(signal?: AbortSignal) {
+  return apiFetch<InstalledTheme>("/api/v1/plataforma/tema/publico", "", { cache: "no-store", signal });
+}
+
+export function previaTema(token: string, id: string) {
+  return apiFetch<ReleaseReport>(`/api/v1/plataforma/versoes/${id}/previa`, token);
+}
+
+export function aplicarTema(token: string, report: ReleaseReport, confirmation: string) {
+  return apiFetch<InstalledTheme>(`/api/v1/plataforma/versoes/${report.id}/aplicar`, token, {
+    method: "POST", body: JSON.stringify({ revision: report.expected_revision, sha256: report.sha256, confirmation }),
+  });
+}
+
+export function restaurarTema(token: string, revision: number, confirmation: string) {
+  return apiFetch<InstalledTheme>("/api/v1/plataforma/tema/restaurar", token, {
+    method: "POST", body: JSON.stringify({ revision, confirmation }),
+  });
 }
 
 export interface UsuarioAutenticado {

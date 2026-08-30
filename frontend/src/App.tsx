@@ -8,9 +8,11 @@ import { LoginForm } from "./components/LoginForm";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { ApiError, carregarSessaoAtual, limparCacheApi, type SessaoAtual } from "./lib/api";
 import { getSupabaseClient } from "./lib/supabase";
+import { watchThemeUpdates } from "./lib/themeUpdates";
 import "./dashboard.css";
 
 export default function App() {
+  useEffect(watchThemeUpdates, []);
   const isInviteRoute = window.location.pathname === "/auth/convite";
 
   const [authSession, setAuthSession] = useState<Session | null | undefined>(undefined);

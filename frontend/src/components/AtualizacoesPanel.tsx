@@ -4,11 +4,13 @@ import {
   consultarExecutor, testarRepositorio, type ExecutorState,
 } from "../lib/api";
 import "./atualizacoes.css";
+import { ThemeRelease } from "./ThemeRelease";
 
 const labels = {
   RECEBIDO: "Recebido — ainda não analisado",
   BLOQUEADO: "Bloqueado pela análise",
   AGUARDANDO_EXECUTOR: "Estrutura válida — aguardando testes isolados",
+  TEMA_VALIDADO: "Tema validado — confira a prévia",
 };
 
 export function AtualizacoesPanel({ accessToken }: { accessToken: string }) {
@@ -100,10 +102,11 @@ export function AtualizacoesPanel({ accessToken }: { accessToken: string }) {
       </div>
     </header>
     <div className="release-warning" role="status">
-      Os testes do repositório são separados da análise do ZIP. Compatibilidade, testes do
-      pacote e aplicação permanecem bloqueados. Nenhum resultado abaixo libera publicação.
+      Temas declarativos podem ser validados, visualizados e aplicados somente na homologação.
+      Pacotes de código continuam bloqueados. Testes do GitHub verificam o repositório, não o ZIP.
     </div>
     {error ? <div className="form-error" role="alert">{error}</div> : null}
+    <article className="release-card"><ThemeRelease token={accessToken} /></article>
     <article className="release-card">
       <h3>Executor GitHub Actions — código do repositório</h3>
       <p>Roda Ruff, testes backend, TypeScript e build fora do seu computador, sem banco real.</p>
@@ -149,7 +152,8 @@ export function AtualizacoesPanel({ accessToken }: { accessToken: string }) {
       <div className="release-actions">
         <button type="button" className="release-analyze-action" disabled={busy} onClick={() => void analyze(report.id)}>Analisar estrutura</button>
         <button type="button" className="release-report-action" onClick={() => download(report)}>Baixar relatório</button>
-        <button type="button" className="release-apply-action" disabled title="Aguardando executor isolado e testes">Aplicar na homologação</button>
+        {report.status === "TEMA_VALIDADO" ? <ThemeRelease token={accessToken} report={report} /> :
+          <button type="button" className="release-apply-action" disabled title="Somente temas declarativos validados podem ser aplicados">Aplicação bloqueada</button>}
       </div>
     </article>)}
   </section>;

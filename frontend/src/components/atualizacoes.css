@@ -166,6 +166,16 @@
 }
 .release-card dd { margin: 0; color: var(--ls-text-soft); font-weight: 750; }
 .release-hash { color: var(--ls-muted); overflow-wrap: anywhere; }
+.theme-release { width: 100%; min-width: 0; }
+.theme-release small { overflow-wrap: anywhere; }
+.theme-preview { margin-top: 16px; padding: 20px; border-radius: 12px; }
+.theme-preview.light { background: #d7ecdc; color: #12301b; }
+.theme-preview.dark { background: #2c406e; color: #f8fafc; }
+.theme-samples { display: flex; flex-wrap: wrap; gap: 12px; }
+.release-panel .theme-samples button { border: 2px solid; padding: 12px 20px; border-radius: 9px; font-size: 15px; }
+.theme-confirm { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; margin-top: 20px; }
+.theme-confirm label { display: grid; gap: 8px; }
+.theme-confirm input { min-height: 44px; padding: 10px; border: 1px solid var(--ls-border); border-radius: 8px; color: var(--ls-text); background: var(--ls-surface); }
 
 :root[data-theme="dark"] .release-upload,
 :root[data-theme="dark"] .release-card {
@@ -194,4 +204,26 @@
   .release-upload, .release-card { padding: 16px; }
   .release-actions button { width: 100%; }
   .release-flow i { display: none; }
+}
+
+/* O painel usa os mesmos tokens de botões que os demais módulos. */
+:root .release-panel {
+  --release-cyan: var(--ls-sem-info);
+  --release-purple: var(--ls-sem-edit);
+  --release-orange: var(--ls-sem-warning);
+  --release-green: var(--ls-sem-success);
+  --release-pink: var(--ls-sem-special);
+  --release-red: var(--ls-sem-danger);
+}
+:root[data-theme] .release-panel {
+  --release-cyan: var(--ls-sem-info);
+  --release-purple: var(--ls-sem-edit);
+  --release-orange: var(--ls-sem-warning);
+  --release-green: var(--ls-sem-success);
+  --release-pink: var(--ls-sem-special);
+  --release-red: var(--ls-sem-danger);
+}
+:root[data-theme] .release-panel button.release-upload-action:not(:disabled) {
+  border-color: var(--ls-sem-success-bg) !important;
+  background: var(--ls-sem-success-bg) !important;
 }

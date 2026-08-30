@@ -1,7 +1,7 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 from starlette.concurrency import run_in_threadpool
 
@@ -10,6 +10,7 @@ from app.dependencies import CurrentSession
 from app.security import AuthenticatedRequest, get_authenticated_request
 from app.services import github_executor
 from app.services.release_validation import MAX_UPLOAD, ReleaseStore
+from app.services.theme_updates import INITIAL, ThemeStore
 
 router = APIRouter(prefix="/plataforma", tags=["Plataforma — homologação"])
 Auth = Annotated[AuthenticatedRequest, Depends(get_authenticated_request)]
@@ -106,10 +107,58 @@ async def report(identifier: UUID, admin: Admin) -> dict:
         raise HTTPException(404, str(exc)) from exc
 
 
+class ThemeConfirmation(BaseModel):
+    revision: int = Field(ge=0)
+    confirmation: str = Field(max_length=80)
+    sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+
+
 @router.post("/versoes/{identifier}/aplicar")
-async def apply_release(identifier: UUID, admin: Admin) -> dict:
-    # Nunca tratar análise estática como aprovação de build/testes/deploy.
-    raise HTTPException(
-        409,
-        "Aplicação bloqueada: executor isolado, testes e recuperação ainda não configurados.",
-    )
+async def apply_release(identifier: UUID, admin: Admin, body: ThemeConfirmation | None = None):
+    if body is None:
+        raise HTTPException(409, "Confira a prévia e confirme a aplicação do tema.")
+    return await theme_change(admin, body, str(identifier))
+
+
+def theme_store():
+    return ThemeStore(get_settings().updates_store_path)
+
+
+@router.get("/tema/publico")
+async def public_theme(response: Response):
+    response.headers["Cache-Control"] = "no-store"
+    if not environment_allowed():
+        return INITIAL
+    return await run_in_threadpool(theme_store().state)
+
+
+@router.get("/tema/historico")
+async def theme_history(admin: Admin):
+    return await run_in_threadpool(theme_store().history)
+
+
+@router.get("/versoes/{identifier}/previa")
+async def preview_theme(identifier: UUID, admin: Admin):
+    try:
+        return await run_in_threadpool(theme_store().preview, str(identifier))
+    except LookupError as exc:
+        raise HTTPException(404, str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(409, str(exc)) from exc
+
+
+async def theme_change(admin, body, identifier=None):
+    try:
+        return await run_in_threadpool(
+            theme_store().change, str(admin.claims.sub), body.revision,
+            body.confirmation, identifier, body.sha256,
+        )
+    except LookupError as exc:
+        raise HTTPException(404, str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(409, str(exc)) from exc
+
+
+@router.post("/tema/restaurar")
+async def restore_theme(body: ThemeConfirmation, admin: Admin):
+    return await theme_change(admin, body)

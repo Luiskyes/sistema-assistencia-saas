@@ -17,6 +17,17 @@ MAX_STORE = 100 * 1024 * 1024
 MAX_EXPANDED = 40 * 1024 * 1024
 
 
+def strict_json(payload):
+    def unique(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError("JSON contém campos duplicados.")
+            result[key] = value
+        return result
+    return json.loads(payload, object_pairs_hook=unique)
+
+
 def inspect_package(payload: bytes) -> dict:
     errors: list[str] = []
     manifest: dict = {}
@@ -29,7 +40,7 @@ def inspect_package(payload: bytes) -> dict:
             for entry in entries:
                 name = entry.orig_filename
                 path = PurePosixPath(name)
-                if (path.is_absolute() or ".." in path.parts or "\\" in name
+                if (path.is_absolute() or ".." in path.parts or "\\" in name or "\u0000" in name
                         or ":" in name or stat.S_ISLNK(entry.external_attr >> 16)):
                     raise ValueError("Pacote contém caminho inseguro ou link simbólico.")
                 if name.casefold() in names:
@@ -46,7 +57,7 @@ def inspect_package(payload: bytes) -> dict:
             info = archive.getinfo("release.json")
             if info.file_size > 65536:
                 raise ValueError("O manifesto release.json é muito grande.")
-            parsed = json.loads(archive.read(info))
+            parsed = strict_json(archive.read(info))
             if not isinstance(parsed, dict):
                 raise ValueError("release.json precisa ser um objeto JSON.")
             manifest = parsed
@@ -58,10 +69,28 @@ def inspect_package(payload: bytes) -> dict:
                 errors.append("Informe base_version no formato 1.2.3.")
             if not isinstance(manifest.get("notes"), str) or not manifest["notes"].strip():
                 errors.append("Descreva as alterações em notes.")
+            if manifest.get("kind") == "theme":
+                from app.services.theme_updates import validate_theme
+
+                if errors:
+                    raise ValueError(" ".join(errors))
+                themes, ratios = validate_theme(archive, manifest)
+                version = tuple(map(int, manifest["version"].split(".")))
+                base = tuple(map(int, manifest["base_version"].split(".")))
+                if version <= base:
+                    raise ValueError("A versão nova precisa ser maior que a versão base.")
+                return {
+                    "status": "TEMA_VALIDADO", "kind": "theme", "errors": [],
+                    "version": manifest["version"], "base_version": manifest["base_version"],
+                    "notes": manifest["notes"][:4000], "themes": themes, "contrast": ratios,
+                    "checks": {"estrutura": "PASSOU", "cores_e_contraste": "PASSOU",
+                               "compatibilidade": "CONFERIR_NA_PREVIA"},
+                    "notice": "Tema declarativo validado. Confira a prévia antes de aplicar.",
+                }
             for required in ("frontend/package.json", "backend/app/main.py", "pyproject.toml"):
                 if required not in archive.namelist():
                     errors.append(f"Arquivo obrigatório ausente: {required}.")
-    except (zipfile.BadZipFile, KeyError, UnicodeError, json.JSONDecodeError):
+    except (zipfile.BadZipFile, KeyError, UnicodeError, json.JSONDecodeError, RecursionError):
         errors.append("ZIP inválido ou release.json ausente/inválido na raiz.")
     except ValueError as exc:
         errors.append(str(exc))
