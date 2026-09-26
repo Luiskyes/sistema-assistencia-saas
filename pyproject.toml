@@ -14,6 +14,7 @@ dependencies = [
   "pydantic[email]>=2.10,<3",
   "pydantic-settings>=2.7,<3",
   "pyjwt[crypto]>=2.10,<3",
+  "reportlab>=4.2,<5",
   "uvicorn[standard]>=0.34,<1",
 ]
 
@@ -25,10 +26,11 @@ dev = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["app"]
+packages = ["backend/app"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["backend"]
 asyncio_mode = "auto"
 
 [tool.ruff]

@@ -1,9 +1,12 @@
+import logging
 from typing import Any
 
 import httpx
 from fastapi import HTTPException, status
 
 from app.config import Settings
+
+logger = logging.getLogger(__name__)
 
 
 class SupabaseDataAPI:
@@ -26,6 +29,7 @@ class SupabaseDataAPI:
             headers=self._headers(token),
         )
         if response.status_code == status.HTTP_401_UNAUTHORIZED:
+            logger.warning("PostgREST rejeitou token ao consultar tabela %s", table)
             raise HTTPException(status_code=401, detail="Sessão expirada ou inválida")
         if response.status_code == status.HTTP_403_FORBIDDEN:
             raise HTTPException(status_code=403, detail="Acesso não autorizado")
@@ -66,6 +70,51 @@ class SupabaseDataAPI:
         )
         data = self._handle_mutation_response(response)
         return data[0] if data else None
+
+    async def delete(
+        self,
+        table: str,
+        token: str,
+        *,
+        filters: dict[str, str],
+    ) -> dict[str, Any] | None:
+        response = await self.http_client.delete(
+            f"{self.settings.supabase_url}/rest/v1/{table}",
+            params=filters,
+            headers={**self._headers(token), "Prefer": "return=representation"},
+        )
+        data = self._handle_mutation_response(response)
+        return data[0] if data else None
+
+    async def rpc(
+        self,
+        function: str,
+        token: str,
+        *,
+        payload: dict[str, Any],
+    ) -> Any:
+        response = await self.http_client.post(
+            f"{self.settings.supabase_url}/rest/v1/rpc/{function}",
+            json=payload,
+            headers=self._headers(token),
+        )
+        if response.status_code == status.HTTP_401_UNAUTHORIZED:
+            raise HTTPException(status_code=401, detail="Sessão expirada ou inválida")
+        if response.status_code == status.HTTP_403_FORBIDDEN:
+            raise HTTPException(status_code=403, detail="Operação não autorizada")
+        if response.status_code == status.HTTP_400_BAD_REQUEST:
+            detail = "Dados rejeitados pelo banco"
+            try:
+                body = response.json()
+                detail = body.get("message") or detail
+            except ValueError:
+                pass
+            raise HTTPException(status_code=400, detail=detail)
+        if response.is_error:
+            raise HTTPException(status_code=502, detail="Falha ao executar operação no banco")
+        if not response.content:
+            return None
+        return response.json()
 
     @staticmethod
     def _handle_mutation_response(response: httpx.Response) -> list[dict[str, Any]]:

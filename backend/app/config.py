@@ -1,13 +1,14 @@
+import os
 from functools import lru_cache
 from typing import Annotated
 
-from pydantic import Field, field_validator
+from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=os.getenv("LSASSIST_ENV_FILE", ".env"),
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",
@@ -22,6 +23,11 @@ class Settings(BaseSettings):
         default_factory=lambda: ["http://localhost:5173"]
     )
     equipment_encryption_key: str | None = None
+    updates_homolog_project_ref: str = ""
+    updates_store_path: str = ".local-updates/homologacao.sqlite3"
+    # Somente no backend homologado; nunca VITE_* nem no pacote enviado.
+    updates_github_token: SecretStr | None = None
+    updates_github_ref: str = ""
 
     @field_validator("supabase_url")
     @classmethod

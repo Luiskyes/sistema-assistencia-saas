@@ -46,9 +46,7 @@ async def list_equipamentos(
     return [EquipamentoResponse.model_validate(row) for row in rows]
 
 
-@router.get(
-    "/{id_equip}", response_model=EquipamentoResponse, summary="Consulta um equipamento"
-)
+@router.get("/{id_equip}", response_model=EquipamentoResponse, summary="Consulta um equipamento")
 async def get_equipamento(
     id_equip: UUID,
     request: Request,
@@ -95,9 +93,7 @@ async def create_equipamento(
     return EquipamentoResponse.model_validate(row)
 
 
-@router.patch(
-    "/{id_equip}", response_model=EquipamentoResponse, summary="Altera um equipamento"
-)
+@router.patch("/{id_equip}", response_model=EquipamentoResponse, summary="Altera um equipamento")
 async def update_equipamento(
     id_equip: UUID,
     payload: EquipamentoUpdate,
