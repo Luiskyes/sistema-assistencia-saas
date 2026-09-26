@@ -13,6 +13,15 @@ export interface ReleaseReport {
   notice?: string;
   errors: string[];
   checks?: Record<string, string>;
+  code_plan?: {
+    package_sha256: string;
+    base_version: string;
+    version: string;
+    files: { path: string; bytes: number; sha256: string }[];
+    migrations: { path: string; sha256: string; review: string }[];
+    blockers: string[];
+    recovery: { notice: string };
+  } | null;
 }
 
 export function disponibilidadePlataforma(token: string) {

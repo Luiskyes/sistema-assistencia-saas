@@ -44,7 +44,7 @@ export function Dashboard({ sessao, accessToken, onLogout }: DashboardProps) {
 
   const title =
     view === "resumo"
-      ? "Resumo"
+      ? "Início"
       : view === "clientes"
         ? "Clientes"
         : view === "equipamentos"
@@ -64,7 +64,7 @@ export function Dashboard({ sessao, accessToken, onLogout }: DashboardProps) {
       <aside className="dashboard-sidebar">
         <div className="dashboard-brand">
           <LSAssistLogo inverse />
-          <small>Gestão para Assistências Técnicas</small>
+          <small>Operação inteligente para assistências</small>
         </div>
 
         <div className="tenant-card">
@@ -78,7 +78,7 @@ export function Dashboard({ sessao, accessToken, onLogout }: DashboardProps) {
             className={`dashboard-nav-item ${view === "resumo" ? "dashboard-nav-item-active" : ""}`}
             onClick={() => setView("resumo")}
           >
-            <span>⌂</span> Resumo
+            <span>⌂</span> Início
           </button>
           <button
             className={`dashboard-nav-item ${view === "clientes" ? "dashboard-nav-item-active" : ""}`}
@@ -178,20 +178,24 @@ export function Dashboard({ sessao, accessToken, onLogout }: DashboardProps) {
           ) : (
             <section className="overview-page home-organized">
               <section className="home-hero">
+                <span className="home-hero-glow home-hero-glow-one" aria-hidden="true" />
+                <span className="home-hero-glow home-hero-glow-two" aria-hidden="true" />
                 <div className="home-hero-copy">
-                  <span className="page-kicker">
+                  <div className="home-hero-eyebrow">
+                    <span className="home-live-dot" aria-hidden="true" />
                     {usuario.funcao_usuario === "DONO"
-                      ? "PAINEL ADMINISTRATIVO"
-                      : "PAINEL OPERACIONAL"}
-                  </span>
-                  <h2>Olá, {usuario.nome_usuario.split(" ")[0]}.</h2>
+                      ? "Central de gestão ativa"
+                      : "Área operacional ativa"}
+                  </div>
+                  <h2>Olá, {usuario.nome_usuario.split(" ")[0]}.<br /><span>Vamos organizar o dia?</span></h2>
                   <p>
-                    Centralize o atendimento: abra a OS, acompanhe o diagnóstico,
-                    consulte estoque e responda o cliente sem perder tempo entre telas.
+                    Todo o fluxo da assistência em uma visão clara: atendimento,
+                    diagnóstico, orçamento e entrega trabalhando juntos.
                   </p>
                 </div>
 
                 <div className="home-main-actions">
+                  <span className="home-actions-label">Comece por aqui</span>
                   <button
                     className="primary-action home-primary-action"
                     onClick={() => abrirNovaOS()}
@@ -199,7 +203,7 @@ export function Dashboard({ sessao, accessToken, onLogout }: DashboardProps) {
                     <span>+</span>
                     <div>
                       <strong>Nova Ordem de Serviço</strong>
-                      <small>Cliente → equipamento → atendimento</small>
+                      <small>Inicie um atendimento completo</small>
                     </div>
                   </button>
 
@@ -210,7 +214,7 @@ export function Dashboard({ sessao, accessToken, onLogout }: DashboardProps) {
                     <span>◎</span>
                     <div>
                       <strong>Localizar cliente</strong>
-                      <small>Cadastro, histórico e nova OS</small>
+                      <small>Consulte cadastro e histórico</small>
                     </div>
                   </button>
                 </div>
@@ -220,92 +224,74 @@ export function Dashboard({ sessao, accessToken, onLogout }: DashboardProps) {
                 <div className="home-section-heading">
                   <div>
                     <span className="page-kicker">Área de trabalho</span>
-                    <h3>Acesso rápido</h3>
+                    <h3>O que você precisa fazer agora?</h3>
                   </div>
-                  <p>Os módulos seguem o fluxo real do atendimento.</p>
+                  <p>Atalhos organizados pelo fluxo real da assistência.</p>
                 </div>
 
                 <div className="home-module-grid">
                   <button
                     type="button"
-                    className="home-module-card"
+                    className="home-module-card home-module-card-orders"
                     onClick={() => setView("ordens")}
                   >
-                    <span className="home-module-icon">≡</span>
+                    <span className="home-module-icon">01</span>
                     <div>
                       <strong>Ordens de Serviço</strong>
                       <small>
                         Visualize situação, diagnóstico, orçamento e andamento.
                       </small>
                     </div>
-                    <b>→</b>
+                    <b aria-hidden="true">↗</b>
                   </button>
 
                   <button
                     type="button"
-                    className="home-module-card"
+                    className="home-module-card home-module-card-clients"
                     onClick={() => setView("clientes")}
                   >
-                    <span className="home-module-icon">◎</span>
+                    <span className="home-module-icon">02</span>
                     <div>
                       <strong>Clientes</strong>
                       <small>
                         Localize rapidamente ou abra nova OS direto do cliente.
                       </small>
                     </div>
-                    <b>→</b>
+                    <b aria-hidden="true">↗</b>
                   </button>
 
                   <button
                     type="button"
-                    className="home-module-card"
+                    className="home-module-card home-module-card-equipment"
                     onClick={() => setView("equipamentos")}
                   >
-                    <span className="home-module-icon">▣</span>
+                    <span className="home-module-icon">03</span>
                     <div>
                       <strong>Equipamentos</strong>
                       <small>
                         Consulte aparelhos vinculados e histórico por cliente.
                       </small>
                     </div>
-                    <b>→</b>
+                    <b aria-hidden="true">↗</b>
                   </button>
 
                   <button
                     type="button"
-                    className="home-module-card"
+                    className="home-module-card home-module-card-stock"
                     onClick={() => setView("estoque")}
                   >
-                    <span className="home-module-icon">▤</span>
+                    <span className="home-module-icon">04</span>
                     <div>
                       <strong>Estoque</strong>
                       <small>
                         Veja disponibilidade antes de fechar o orçamento.
                       </small>
                     </div>
-                    <b>→</b>
+                    <b aria-hidden="true">↗</b>
                   </button>
                 </div>
               </section>
 
-              <section className="home-flow-strip">
-                <div>
-                  <span className="page-kicker">Fluxo recomendado</span>
-                  <h3>Do recebimento à aprovação sem voltar etapas.</h3>
-                </div>
-
-                <div className="home-flow-steps">
-                  <span><b>1</b> Cliente</span>
-                  <i>→</i>
-                  <span><b>2</b> Equipamento</span>
-                  <i>→</i>
-                  <span><b>3</b> Diagnóstico</span>
-                  <i>→</i>
-                  <span><b>4</b> Orçamento</span>
-                  <i>→</i>
-                  <span><b>5</b> Aprovação</span>
-                </div>
-              </section>
             </section>
           )}
         </div>

@@ -26,6 +26,7 @@ $archive = [System.IO.Compression.ZipArchive]::new(
 
 try {
     $manifest = [ordered]@{
+        kind = 'code'
         environment = 'homologacao'
         version = $Version
         base_version = $BaseVersion
@@ -36,7 +37,7 @@ try {
     try { $writer.Write($manifest) } finally { $writer.Dispose() }
 
     $roots = @('backend', 'frontend/src', 'tests', 'supabase/migrations')
-    $files = @('main.py', 'pyproject.toml', 'frontend/package.json',
+    $files = @('main.py', 'pyproject.toml', 'frontend/index.html', 'frontend/package.json',
         'frontend/package-lock.json', 'frontend/tsconfig.json', 'frontend/tsconfig.app.json',
         'frontend/tsconfig.node.json', 'frontend/vite.config.ts')
     foreach ($relative in $roots) {

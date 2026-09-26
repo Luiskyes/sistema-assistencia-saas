@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 type Props = {
   label: string;
@@ -24,9 +24,29 @@ export function PresetSelect({
   customMultiline = false,
 }: Props) {
   const panelId = useId();
+  const fieldRef = useRef<HTMLDivElement>(null);
   const valueIsPreset = options.includes(value);
   const [open, setOpen] = useState(false);
   const [customMode, setCustomMode] = useState(Boolean(value) && !valueIsPreset);
+
+  useEffect(() => {
+    if (!open) return;
+
+    function closeOnOutsideInteraction(event: PointerEvent) {
+      if (!fieldRef.current?.contains(event.target as Node)) setOpen(false);
+    }
+
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpen(false);
+    }
+
+    document.addEventListener("pointerdown", closeOnOutsideInteraction);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutsideInteraction);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [open]);
 
   function select(option: string) {
     setCustomMode(false);
@@ -43,11 +63,12 @@ export function PresetSelect({
   const displayValue = value || (customMode ? customLabel : placeholder);
 
   return (
-    <div className="preset-field">
+    <div className="preset-field" ref={fieldRef}>
       <span className="preset-field-label">{label}{required ? " *" : ""}</span>
       <button
         type="button"
         className={`preset-trigger ${value || customMode ? "has-value" : ""}`}
+        aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((current) => !current)}

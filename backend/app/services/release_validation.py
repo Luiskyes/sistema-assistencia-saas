@@ -31,6 +31,7 @@ def strict_json(payload):
 def inspect_package(payload: bytes) -> dict:
     errors: list[str] = []
     manifest: dict = {}
+    code_plan = None
     try:
         with zipfile.ZipFile(io.BytesIO(payload)) as archive:
             entries = archive.infolist()
@@ -48,10 +49,12 @@ def inspect_package(payload: bytes) -> dict:
                 names.add(name.casefold())
                 if entry.flag_bits & 1:
                     raise ValueError("Não é permitido ZIP protegido por senha.")
-                if any(part in {".git", "node_modules", ".venv"} for part in path.parts):
+                if any(part.casefold() in {".git", "node_modules", ".venv"}
+                       for part in path.parts):
                     raise ValueError("Não envie .git, node_modules ou .venv no pacote.")
-                if path.name == ".env" or (
-                    path.name.startswith(".env.") and not path.name.endswith(".example")
+                if path.name.casefold() == ".env" or (
+                    path.name.casefold().startswith(".env.")
+                    and not path.name.casefold().endswith(".example")
                 ):
                     raise ValueError("Remova arquivos .env com credenciais do pacote.")
             info = archive.getinfo("release.json")
@@ -90,6 +93,17 @@ def inspect_package(payload: bytes) -> dict:
             for required in ("frontend/package.json", "backend/app/main.py", "pyproject.toml"):
                 if required not in archive.namelist():
                     errors.append(f"Arquivo obrigatório ausente: {required}.")
+            if manifest.get("kind") not in (None, "code"):
+                errors.append("Tipo de pacote desconhecido. Use kind=code ou kind=theme.")
+            if not errors:
+                if tuple(map(int, manifest["version"].split("."))) <= tuple(
+                    map(int, manifest["base_version"].split("."))
+                ):
+                    errors.append("A versão nova precisa ser maior que a versão base.")
+                else:
+                    from app.services.code_updates import prepare_code_plan
+
+                    code_plan = prepare_code_plan(archive, manifest, payload)
     except (zipfile.BadZipFile, KeyError, UnicodeError, json.JSONDecodeError, RecursionError):
         errors.append("ZIP inválido ou release.json ausente/inválido na raiz.")
     except ValueError as exc:
@@ -100,6 +114,7 @@ def inspect_package(payload: bytes) -> dict:
         "status": "BLOQUEADO" if errors else "AGUARDANDO_EXECUTOR",
         "errors": errors,
         "version": str(manifest.get("version", ""))[:60],
+        "code_plan": code_plan if not errors else None,
         "checks": {
             "estrutura": "FALHOU" if errors else "PASSOU",
             "compatibilidade": "NAO_EXECUTADO",

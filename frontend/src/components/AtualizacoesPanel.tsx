@@ -149,6 +149,23 @@ export function AtualizacoesPanel({ accessToken }: { accessToken: string }) {
       <dl>{Object.entries(report.checks ?? {}).map(([check, state]) =>
         <div key={check}><dt>{check}</dt><dd>{state.replaceAll("_", " ")}</dd></div>)}</dl>
       {report.notice ? <p>{report.notice}</p> : null}
+      {report.code_plan ? <details>
+        <summary>Plano de atualização — arquivos, banco e recuperação</summary>
+        <p>Aplicativo: {report.code_plan.base_version} → {report.code_plan.version}.
+          Essas versões são declaradas pelo pacote, ainda não comparadas com a instalação.</p>
+        <p>{report.code_plan.files.length} arquivos inventariados;
+          {` ${report.code_plan.migrations.length}`} arquivos SQL para revisão.
+          O relatório para download inclui o hash de cada arquivo.</p>
+        <h4>O que falta para instalar</h4>
+        <ul>{report.code_plan.blockers.map((blocker) => <li key={blocker}>{blocker}</li>)}</ul>
+        {report.code_plan.migrations.length ? <details>
+          <summary>Arquivos SQL — não executados</summary>
+          <ul>{report.code_plan.migrations.map((migration) =>
+            <li key={migration.path}>{migration.path}</li>)}</ul>
+        </details> : null}
+        <p>{report.code_plan.recovery.notice}</p>
+        <p>Produção permanece desabilitada. Este plano não é autorização de publicação.</p>
+      </details> : null}
       <div className="release-actions">
         <button type="button" className="release-analyze-action" disabled={busy} onClick={() => void analyze(report.id)}>Analisar estrutura</button>
         <button type="button" className="release-report-action" onClick={() => download(report)}>Baixar relatório</button>

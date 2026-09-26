@@ -227,3 +227,78 @@
   border-color: var(--ls-sem-success-bg) !important;
   background: var(--ls-sem-success-bg) !important;
 }
+
+/* Refinamento de leitura: mais largura, respiro e tabelas sem compressão */
+.release-panel {
+  width: min(100%, 1280px);
+  gap: 22px;
+}
+.release-panel header { gap: 10px; }
+.release-panel header h2 { font-size: clamp(1.45rem, 2vw, 1.8rem); letter-spacing: -.025em; }
+.release-panel header p { max-width: 880px; line-height: 1.65; }
+.release-warning { padding: 17px 19px; line-height: 1.7; }
+.release-upload,
+.release-card {
+  gap: 16px;
+  padding: clamp(20px, 2.2vw, 28px);
+  border-radius: 16px;
+}
+.release-card h3 { font-size: 1.08rem; line-height: 1.4; }
+.release-card p,
+.release-card li,
+.release-upload label { line-height: 1.65; }
+.release-card ul { display: grid; gap: 7px; }
+.release-card dl {
+  display: grid;
+  overflow: hidden;
+  border: 1px solid var(--ls-border);
+  border-radius: 11px;
+}
+.release-card dl > div {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(190px, auto);
+  align-items: center;
+  gap: 24px;
+  min-height: 46px;
+  padding: 10px 14px;
+}
+.release-card dl > div:last-child { border-bottom: 0; }
+.release-card dt { min-width: 0; overflow-wrap: anywhere; }
+.release-card dd {
+  min-width: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.release-hash {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: var(--ls-surface-2);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: .72rem;
+  line-height: 1.55;
+}
+.release-actions { align-items: center; gap: 10px; }
+.release-actions button { min-width: 148px; }
+.release-upload input[type="file"] { min-height: 50px; padding: 7px; }
+.release-upload input[type="file"]::file-selector-button { min-height: 36px; }
+.theme-release { display: grid; gap: 12px; }
+.theme-release > h3,
+.theme-release > p { margin: 0; }
+.theme-confirm {
+  padding: 16px;
+  border: 1px solid var(--ls-border);
+  border-radius: 12px;
+  background: var(--ls-surface-2);
+}
+.theme-confirm label { flex: 1 1 320px; line-height: 1.55; }
+.theme-confirm input { width: 100%; min-width: 0; }
+.release-panel button:hover:not(:disabled) { filter: none !important; }
+
+@media (max-width: 720px) {
+  .release-card dl > div { grid-template-columns: 1fr; gap: 5px; }
+  .release-card dd { text-align: left; }
+  .release-actions button { width: 100%; min-width: 0; }
+  .theme-confirm { align-items: stretch; }
+  .theme-confirm button { width: 100%; }
+}
