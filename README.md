@@ -1,118 +1,393 @@
-# Sistema de Assistência
+# LSAssist
 
-Backend SaaS multiempresa para assistências técnicas, construído com FastAPI e
-PostgreSQL/Supabase.
+Sistema SaaS multiempresa para gestão de assistências técnicas.
 
-## O que já existe
+O **LSAssist** centraliza clientes, equipamentos, ordens de serviço, estoque e processos operacionais de uma assistência técnica em uma aplicação web, mantendo isolamento dos dados entre empresas.
 
-- Esquema PostgreSQL multiempresa em supabase/schema.sql.
-- RLS para separar os dados de cada assistência.
-- API FastAPI com CORS configurável.
-- Validação de tokens do Supabase Auth.
-- Consulta do perfil atual usando a Data API e preservando a RLS.
-- Cadastro, listagem, busca, consulta e edição de clientes.
-- Cadastro, listagem, filtro, consulta e edição de equipamentos vinculados aos clientes.
-- Controle de estoque, saldo mínimo, ajustes e histórico de movimentações.
-- Fluxo de ordens de serviço com permissões por função e histórico de status.
-- Geração de pré-nota/orçamento em PDF para impressão térmica.
-- Dashboard React com módulos de clientes, equipamentos, estoque e ordens.
-- Normalização de CPF e bloqueio do id da assistência enviado pelo navegador.
-- Endpoint público de saúde e documentação Swagger.
-- Frontend React com login e definição de senha por convite.
+> Projeto atualmente em desenvolvimento e homologação. O ambiente de produção ainda não está liberado.
 
-## Configuração local sem Docker
+## Tecnologias
 
-Requer Python 3.11 ou mais recente.
+### Frontend
 
-    python -m venv .venv
-    .\.venv\Scripts\Activate.ps1
-    python -m pip install -e ".[dev]"
-    Copy-Item .env.example .env
+- React 19
+- TypeScript
+- Vite
+- Supabase Auth
 
-Preencha no arquivo .env:
+### Backend
 
-- SUPABASE_URL: Dashboard do Supabase, Project Settings, API.
-- SUPABASE_PUBLISHABLE_KEY: chave pública/publishable do mesmo painel.
-- FRONTEND_ORIGINS: endereços autorizados a chamar a API.
+- Python 3.11+
+- FastAPI
+- Pydantic
+- ReportLab
+- Pytest
 
-Não coloque a chave service_role no frontend nem a versione no repositório.
+### Banco e autenticação
 
-Gere a chave que será usada futuramente para proteger senhas de equipamentos:
+- PostgreSQL
+- Supabase
+- Row Level Security (RLS)
+- Supabase Auth
+- PostgREST / Data API
 
-    python -m app.scripts.generate_encryption_key
+## Funcionalidades atuais
 
-Copie o resultado para EQUIPMENT_ENCRYPTION_KEY no arquivo .env.
+O LSAssist já possui:
 
-## Executar
+- autenticação com Supabase Auth;
+- definição de senha por convite;
+- sessão autenticada integrada ao backend;
+- arquitetura SaaS multiempresa;
+- separação dos dados de cada assistência por RLS;
+- cadastro e gerenciamento de clientes;
+- cadastro e gerenciamento de equipamentos;
+- controle de estoque;
+- saldo mínimo e movimentações de estoque;
+- criação e gerenciamento de ordens de serviço;
+- diagnóstico técnico;
+- orçamento da ordem de serviço;
+- peças próprias e peças adquiridas externamente;
+- fluxo de aprovação;
+- controle de status da OS;
+- histórico operacional;
+- geração de pré-nota em PDF para impressão térmica;
+- dashboard operacional;
+- permissões conforme a função do usuário;
+- tema claro e escuro;
+- identidade visual LSAssist;
+- área administrativa da plataforma protegida;
+- homologação de atualizações declarativas de tema;
+- inspeção de pacotes de atualização de código.
 
-    uvicorn main:app --reload
+A instalação automática de pacotes de código e migrations pelo painel ainda **não está habilitada**.
 
-Abra:
+## Fluxo da ordem de serviço
 
-- API: http://127.0.0.1:8000/health
-- Swagger: http://127.0.0.1:8000/docs
+O fluxo operacional foi projetado aproximadamente como:
 
-## Testar
+```text
+Cliente
+  ↓
+Equipamento
+  ↓
+Ordem de Serviço
+  ↓
+Diagnóstico Técnico
+  ↓
+Orçamento
+  ↓
+Aprovação do Cliente
+  ↓
+Manutenção
+  ↓
+Validação Técnica
+  ↓
+Validação Administrativa
+  ↓
+Pré-nota / Documento
+  ↓
+Conclusão e Entrega
+```
 
-    python -m pytest -q
-    ruff check backend/app tests main.py
-    cd frontend
-    npm.cmd run typecheck
-    npm.cmd run build
+Os principais estados atualmente utilizados são:
 
-## Banco e migrations
+```text
+RECEBIDO
+EM_ANALISE
+AGUARDANDO_APROVACAO
+EM_MANUTENCAO
+CONCLUIDO
+ENTREGUE
+CANCELADO
+```
 
-Em um projeto novo, execute primeiro `supabase/schema.sql`. Em um projeto já
-existente, aplique em ordem os arquivos de `supabase/migrations/`.
+## Arquitetura multiempresa
 
-A migration `004_permissoes_defesa_em_profundidade.sql` replica no banco as
-restrições operacionais do FastAPI, impedindo contorno das regras via PostgREST.
+Cada assistência técnica possui seus próprios usuários e dados.
 
-## Como a autenticação funciona
+O frontend **não define livremente a assistência proprietária de um registro**. A associação com a empresa é obtida a partir do usuário autenticado.
 
-1. O frontend realiza o login pelo Supabase Auth.
-2. O Supabase devolve um access token JWT.
-3. O frontend envia Authorization: Bearer TOKEN para o FastAPI.
-4. A API verifica a assinatura e validade do token.
-5. A API consulta o Supabase usando o mesmo token; assim, as policies RLS continuam ativas.
-6. O endpoint /api/v1/sessao/atual devolve o perfil e a assistência do usuário.
+Além das verificações realizadas pela API, o PostgreSQL utiliza políticas de **Row Level Security (RLS)** para reforçar o isolamento entre empresas.
 
-## Rotas atuais
+Fluxo simplificado:
 
-- GET /health
-- GET /api/v1/sessao/atual
-- GET /api/v1/clientes
-- GET /api/v1/clientes/{id_cliente}
-- POST /api/v1/clientes
-- PATCH /api/v1/clientes/{id_cliente}
-- GET /api/v1/equipamentos
-- GET /api/v1/equipamentos/{id_equip}
-- POST /api/v1/equipamentos
-- PATCH /api/v1/equipamentos/{id_equip}
-- GET /api/v1/estoque
-- POST /api/v1/estoque
-- PATCH /api/v1/estoque/{id_item}
-- POST /api/v1/estoque/{id_item}/ajuste
-- GET /api/v1/estoque/{id_item}/movimentos
-- GET /api/v1/usuarios
-- GET /api/v1/ordens
-- POST /api/v1/ordens
-- PATCH /api/v1/ordens/{id_os}
-- POST /api/v1/ordens/{id_os}/status
-- GET /api/v1/ordens/{id_os}/historico
-- GET /api/v1/ordens/{id_os}/pre-nota.pdf
-- POST /api/v1/ordens/{id_os}/pre-nota/impressao
+```text
+React
+  │
+  │ JWT
+  ▼
+FastAPI
+  │
+  │ mesmo contexto autenticado
+  ▼
+Supabase / PostgREST
+  │
+  ▼
+PostgreSQL + RLS
+```
+
+Essa abordagem reduz a dependência exclusiva das verificações do frontend ou da API para isolamento dos dados.
+
+## Autenticação
+
+O fluxo principal funciona da seguinte forma:
+
+1. O frontend autentica o usuário pelo Supabase Auth.
+2. O Supabase fornece um access token JWT.
+3. O frontend envia o token ao FastAPI.
+4. O backend valida a identidade e a sessão.
+5. As operações no Supabase preservam o contexto autenticado.
+6. As políticas RLS continuam sendo aplicadas no banco.
+
+A chave `service_role` nunca deve ser utilizada no frontend.
+
+## Estrutura do projeto
+
+```text
+Sistema de Assistência/
+│
+├── backend/
+│   └── app/
+│       ├── routers/
+│       ├── services/
+│       ├── config.py
+│       ├── dependencies.py
+│       ├── main.py
+│       ├── schemas.py
+│       ├── security.py
+│       └── supabase.py
+│
+├── frontend/
+│   ├── public/
+│   └── src/
+│       ├── components/
+│       └── lib/
+│
+├── supabase/
+│   ├── homologacao/
+│   ├── manutencao/
+│   └── migrations/
+│
+├── scripts/
+├── tests/
+├── branding/
+├── main.py
+├── pyproject.toml
+└── README.md
+```
+
+## Configuração local
+
+O projeto foi preparado para desenvolvimento local sem Docker.
+
+### Requisitos
+
+- Python 3.11 ou superior
+- Node.js / npm
+- Git
+- projeto Supabase configurado
+
+### Backend
+
+Na raiz do projeto:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -e ".[dev]"
+```
+
+Crie sua configuração a partir do exemplo:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Configure somente suas próprias credenciais locais.
+
+Nunca versione arquivos `.env`, tokens, senhas ou chaves privadas.
+
+### Executar o backend
+
+Para desenvolvimento convencional:
+
+```powershell
+uvicorn main:app --reload
+```
+
+API:
+
+```text
+http://127.0.0.1:8000
+```
+
+Health check:
+
+```text
+http://127.0.0.1:8000/health
+```
+
+Swagger:
+
+```text
+http://127.0.0.1:8000/docs
+```
 
 ## Frontend
 
-Com a API ativa na porta 8000:
+Com o backend ativo:
 
-    cd frontend
-    npm.cmd install
-    npm.cmd run dev
+```powershell
+cd frontend
+npm.cmd install
+npm.cmd run dev -- --host 127.0.0.1
+```
 
-Acesse http://127.0.0.1:5173.
+A aplicação ficará disponível em:
 
-O fluxo de convite usa http://127.0.0.1:5173/auth/convite durante o
-desenvolvimento. Essa URL deve ser adicionada no Supabase em Authentication,
-URL Configuration, Redirect URLs antes de enviar um convite.
+```text
+http://127.0.0.1:5173
+```
+
+Durante o desenvolvimento, o fluxo de convite utiliza:
+
+```text
+http://127.0.0.1:5173/auth/convite
+```
+
+Essa URL deve estar cadastrada nas Redirect URLs do Supabase Auth.
+
+## Ambiente de homologação
+
+As evoluções do sistema devem ser validadas em homologação antes de qualquer utilização em produção.
+
+Existe uma configuração separada baseada em:
+
+```text
+.env.homologacao
+```
+
+O repositório fornece apenas o arquivo de exemplo:
+
+```text
+.env.homologacao.example
+```
+
+As credenciais reais não devem ser versionadas.
+
+No Windows, o ambiente pode ser iniciado pelo script:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\iniciar-homologacao.ps1
+```
+
+> Homologação e produção devem permanecer isoladas. Não utilize credenciais de produção para testes.
+
+## Banco de dados e migrations
+
+Para uma instalação nova, o schema inicial está em:
+
+```text
+supabase/schema.sql
+```
+
+As evoluções posteriores ficam em:
+
+```text
+supabase/migrations/
+```
+
+As migrations devem ser aplicadas em ordem.
+
+O projeto utiliza constraints, funções, políticas RLS e regras adicionais no banco para complementar as validações realizadas pela API.
+
+## Testes
+
+### Backend
+
+```powershell
+python -m pytest -q
+```
+
+Validação estática:
+
+```powershell
+ruff check backend/app tests main.py
+```
+
+### Frontend
+
+```powershell
+cd frontend
+npm.cmd run typecheck
+npm.cmd run build
+```
+
+O projeto também possui testes automatizados para fluxos operacionais e para partes da infraestrutura de homologação.
+
+## Atualizações
+
+O LSAssist possui infraestrutura inicial para homologação de atualizações.
+
+Atualmente existem mecanismos para:
+
+- upload controlado de pacotes;
+- identificação por hash SHA-256;
+- inspeção de conteúdo;
+- validação de pacotes;
+- atualização declarativa de temas;
+- restauração de temas;
+- integração com testes executados pelo GitHub Actions;
+- inventário de pacotes de código.
+
+A presença dessas funções **não significa que pacotes de código possam ser instalados automaticamente**.
+
+A instalação automática de código, migrations, promoção para produção e rollback completo ainda fazem parte da evolução da plataforma.
+
+## Segurança
+
+Algumas das medidas adotadas no projeto:
+
+- autenticação baseada em JWT;
+- Row Level Security;
+- isolamento multiempresa;
+- permissões por função;
+- validações também no backend;
+- restrições adicionais no banco;
+- ausência de `service_role` no frontend;
+- CORS configurável;
+- proteção das rotas administrativas;
+- separação entre homologação e produção;
+- credenciais fora do repositório;
+- identificação de pacotes de atualização por SHA-256.
+
+Segurança é tratada em múltiplas camadas e não apenas na interface.
+
+## Status do projeto
+
+O LSAssist está em **desenvolvimento ativo**.
+
+Os módulos centrais de clientes, equipamentos, estoque e ordens de serviço já estão implementados, enquanto funcionalidades adicionais e a infraestrutura completa de atualização/publicação continuam em evolução.
+
+Entre as próximas evoluções planejadas estão:
+
+- checklist de entrada e saída dos equipamentos;
+- registro de acessórios e condições de entrada;
+- fotos associadas ao atendimento;
+- histórico/auditoria mais detalhado;
+- garantia e retorno vinculados à OS original;
+- relatórios de margem;
+- administração comercial das assistências;
+- evolução segura do mecanismo de atualização;
+- preparação futura para implantação em produção.
+
+## Autor
+
+Desenvolvido por **Luis Rogerio**.
+
+## Licença
+
+Projeto proprietário em desenvolvimento.
+
+O código não deve ser redistribuído, publicado ou utilizado comercialmente sem autorização do autor.
